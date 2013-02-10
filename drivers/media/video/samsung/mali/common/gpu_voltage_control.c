@@ -21,7 +21,7 @@
 #include "gpu_voltage_control.h"
 
 #define MIN_VOLTAGE_GPU  600000
-#define MAX_VOLTAGE_GPU 1200000
+#define MAX_VOLTAGE_GPU 1400000
 
 typedef struct mali_dvfs_tableTag{
     unsigned int clock;
@@ -32,14 +32,14 @@ typedef struct mali_dvfs_thresholdTag{
 	unsigned int downthreshold;
 	unsigned int upthreshold;
 }mali_dvfs_threshold_table;
-extern mali_dvfs_table mali_dvfs[4];
-extern mali_dvfs_threshold_table mali_dvfs_threshold[4];
+extern mali_dvfs_table mali_dvfs[2];
+extern mali_dvfs_threshold_table mali_dvfs_threshold[2];
 
-unsigned int gv[4];
+unsigned int gv[2];
 
 static ssize_t gpu_voltage_show(struct device *dev, struct device_attribute *attr, char *buf) {
-	return sprintf(buf, "Step1: %d\nStep2: %d\nStep3: %d\nStep4: %d\n",
-		       mali_dvfs[0].vol, mali_dvfs[1].vol,mali_dvfs[2].vol, mali_dvfs[3].vol);
+	return sprintf(buf, "Step1: %d\nStep2: %d\n",
+		       mali_dvfs[0].vol, mali_dvfs[1].vol);
 }
 
 static ssize_t gpu_voltage_store(struct device *dev, struct device_attribute *attr, const char *buf,
@@ -47,18 +47,18 @@ static ssize_t gpu_voltage_store(struct device *dev, struct device_attribute *at
 	unsigned int ret = -EINVAL;
 	int i = 0;
 
-	ret = sscanf(buf, "%d %d %d %d", &gv[0], &gv[1], &gv[2], &gv[3]);
-	if(ret!=4) return -EINVAL;
+	ret = sscanf(buf, "%d %d", &gv[0], &gv[1]);
+	if(ret!=2) return -EINVAL;
 
 	/* safety floor and ceiling - netarchy */
-	for( i = 0; i < 4; i++ ) {
+	for( i = 0; i < 2; i++ ) {
 		if (gv[i] < MIN_VOLTAGE_GPU) {
 		    gv[i] = MIN_VOLTAGE_GPU;
 		}
 		else if (gv[i] > MAX_VOLTAGE_GPU) {
 		    gv[i] = MAX_VOLTAGE_GPU;
 		}
-		if(ret==4)
+		if(ret==2)
 		    mali_dvfs[i].vol=gv[i];
 	}
 	return count;
