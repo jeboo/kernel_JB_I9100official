@@ -18,6 +18,7 @@
 #include <linux/miscdevice.h>
 
 #include "gpu_clock_control.h"
+#include "../platform/mali_platform.h"
 
 #define GPU_MAX_CLOCK 800
 #define GPU_MIN_CLOCK 10
@@ -85,6 +86,9 @@ static ssize_t gpu_clock_store(struct device *dev, struct device_attribute *attr
 		}
 	}
 
+	// drop rate to step0
+	mali_clk_set_rate(mali_dvfs[0].clock, mali_dvfs[0].freq);
+
 	return count;
 }
 
@@ -106,6 +110,10 @@ static ssize_t gpu_staycount_store(struct device *dev, struct device_attribute *
 		mali_dvfs_staycount[0].staycount = i1;
 		mali_dvfs_staycount[1].staycount = i2;
 	}
+
+	// drop rate to step0
+	mali_clk_set_rate(mali_dvfs[0].clock, mali_dvfs[0].freq);
+
 	return count;
 }
 

@@ -19,6 +19,7 @@
 #include <linux/miscdevice.h>
 
 #include "gpu_voltage_control.h"
+#include "../platform/mali_platform.h"
 
 #define MIN_VOLTAGE_GPU  600000
 #define MAX_VOLTAGE_GPU 1400000
@@ -61,6 +62,10 @@ static ssize_t gpu_voltage_store(struct device *dev, struct device_attribute *at
 		if(ret==2)
 		    mali_dvfs[i].vol=gv[i];
 	}
+
+	// drop voltage to step0
+	mali_regulator_set_voltage(mali_dvfs[0].vol, mali_dvfs[0].vol);
+
 	return count;
 }
 
